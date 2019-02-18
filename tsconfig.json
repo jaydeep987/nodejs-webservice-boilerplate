@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+   "module": "commonjs",
+   "noImplicitAny": true,
+   "outDir": "./dist/",
+   "moduleResolution": "node",
+   "preserveConstEnums": true,
+   "removeComments": true,
+   "target": "es6",
+   "baseUrl": ".",
+   "paths": {
+     "~common/*": [ "src/common/*", "dist/common/*" ],
+     "~controller/*": [ "src/controller/*", "dist/controller/*" ],
+     "~lib/*": [ "src/lib/*", "dist/lib/*" ],
+     "~model/*": [ "src/model/*", "dist/model/*" ],
+     "~utils/*": [ "src/utils/*", "dist/utils/*" ]
+   },
+   "lib": [
+     "dom",
+     "es7",
+   ]
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+ }
+ 
