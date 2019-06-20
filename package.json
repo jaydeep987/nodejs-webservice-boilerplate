@@ -4,13 +4,14 @@
   "description": "Boilerplate to start your first nodejs webapp",
   "main": "dist/index.js",
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "rm -rf dist",
     "build": "npm run clean && tsc",
     "prestart": "npm run build",
     "dev": "nodemon",
     "start": "node -r tsconfig-paths/register dist/index.js",
     "prod": "npm run start",
-    "test": "NODE_ENV=test mocha --reporter spec --exit --require ts-node/register -r tsconfig-paths/register 'test/**/*.test.ts'",
+    "test": "NODE_ENV=test mocha --timeout 5000 --exit --reporter spec --require ts-node/register -r tsconfig-paths/register 'test/**/*.test.ts'",
+    "coverage": "nyc --reporter html --reporter text npm test",
     "lint": "tslint src/**/*.ts"
   },
   "keywords": [
@@ -19,6 +20,19 @@
   ],
   "author": "maybeyou",
   "license": "ISC",
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "all": true
+  },
   "dependencies": {
     "@types/chai-http": "^3.0.5",
     "body-parser": "^1.18.3",
@@ -48,6 +62,7 @@
     "chai-http": "^4.2.1",
     "mocha": "^5.2.0",
     "mongodb-memory-server": "^3.1.1",
+    "nyc": "^14.1.1",
     "proxyquire": "^2.1.0",
     "rimraf": "^2.6.3",
     "sinon": "^7.2.3",
