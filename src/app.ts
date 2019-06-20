@@ -2,8 +2,9 @@ import * as bodyParser from 'body-parser';
 import * as compress from 'compression';
 import * as express from 'express';
 import * as helmet from 'helmet';
+import { errorHandler } from '~lib/error-handler';
 
-import { mongoConnect } from './common/config';
+import { mongoConnect } from './lib/mongo-connect';
 import { routes } from './routes';
 
 /**
@@ -11,19 +12,25 @@ import { routes } from './routes';
  */
 class App {
   /** Express instance to start with */
-  express: express.Application;
+  private express: express.Application;
 
-  constructor() {
+  /**
+   * Creates and initializes app
+   */
+  async createApp(): Promise<express.Application> {
     this.express = express();
-    this.middleware();
+    await this.middleware();
     this.routes();
+    this.configureErrorHandler();
+
+    return this.express;
   }
 
   /**
    * Configures middlewares
    */
-  private middleware(): void {
-    mongoConnect(); // tslint:disable-line:no-floating-promises
+  private async middleware(): Promise<void> {
+    await mongoConnect();
     this.express.use(compress());
     this.express.use(helmet());
     this.express.use(bodyParser.json());
@@ -36,8 +43,13 @@ class App {
   private routes(): void {
     this.express.use('/', routes);
   }
+
+  /**
+   * Configures error handler
+   */
+  private configureErrorHandler(): void {
+    this.express.use(errorHandler);
+  }
 }
 
-const app = new App().express;
-
-export { app };
+export { App };

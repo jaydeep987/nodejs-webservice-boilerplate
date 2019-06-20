@@ -2,6 +2,7 @@ import * as chai from 'chai';
 // chai-http is exported as single object (export =)
 import chaiHttp = require('chai-http');
 import { Application } from 'express';
+import * as http from 'http';
 import * as mocha from 'mocha'; // tslint:disable-line
 import * as mongoose from 'mongoose';
 
@@ -37,6 +38,7 @@ describe('Test Event endpoints', () => {
   let virtualMongoConnector: VirtualMongoServerConnector;
   let addedMockData: mongoose.Document[];
   let app: Application;
+  let server: http.Server;
 
   before(async () => {
     virtualMongoConnector = new VirtualMongoServerConnector();
@@ -44,20 +46,22 @@ describe('Test Event endpoints', () => {
     await virtualMongoConnector.connect();
 
     // load app after we initialize MONGO_URL in config
-    app = (await import('../../src/app')).app;
+    app = await new (await import('../../src/app')).App().createApp();
+    server = http.createServer(app);
 
     // fill data
     addedMockData = await EventModel.create(mockEvents);
   });
 
   after(async () => {
+    chai.request(server).close();
     await virtualMongoConnector.disconnect();
   });
 
   describe('Endpoint: /event/', () => {
     it('should give all events', async () => {
       const response = await chai
-        .request(app)
+        .request(server)
         .get('/event/');
 
       expect(response.status).to.equal(200);
@@ -70,7 +74,7 @@ describe('Test Event endpoints', () => {
 
     it('should give an error if wrong event id passed', async () => {
       const response = await chai
-        .request(app)
+        .request(server)
         .get('/event/wrongid');
 
       expect(response).to.be.json;
@@ -79,7 +83,7 @@ describe('Test Event endpoints', () => {
 
     it('shoud give event by id', async () => {
       const response = await chai
-        .request(app)
+        .request(server)
         .get(`/event/${addedMockData[0]._id}`);
 
       expect(response).to.be.json;
@@ -91,7 +95,7 @@ describe('Test Event endpoints', () => {
   describe('Endpoint: /event/addnewevent', () => {
     it('should give validation error when nothing passed', async () => {
       const response = await chai
-        .request(app)
+        .request(server)
         .put('/event/addnewevent');
 
       expect(response).to.be.json;
@@ -111,7 +115,7 @@ describe('Test Event endpoints', () => {
         status: 'open',
       };
       const response = await chai
-        .request(app)
+        .request(server)
         .put('/event/addnewevent')
         .send(data);
 
@@ -124,7 +128,7 @@ describe('Test Event endpoints', () => {
   describe('Endpoint: /event/deleteevent/:eventId', () => {
     it('should give error if wrong event id is passed', async () => {
       const response = await chai
-        .request(app)
+        .request(server)
         .delete('/event/deleteevent/wrongid');
 
       expect(response).to.be.json;
@@ -133,7 +137,7 @@ describe('Test Event endpoints', () => {
 
     it('should delete event', async () => {
       const response = await chai
-        .request(app)
+        .request(server)
         .delete(`/event/deleteevent/${addedMockData[0]._id}`);
 
       expect(response).to.be.json;
@@ -141,7 +145,7 @@ describe('Test Event endpoints', () => {
 
       // verify event by searching it
       const foundEvent = await chai
-        .request(app)
+        .request(server)
         .get(`/event/${addedMockData[0]._id}`);
 
       expect(foundEvent).to.be.json;

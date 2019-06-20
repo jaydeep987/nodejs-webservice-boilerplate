@@ -1,9 +1,9 @@
 *.log
 *.vscode
 
-node_modules/
-dist/
-logs/
+node_modules
+dist
+logs
 coverage/
 
 .DS_Store

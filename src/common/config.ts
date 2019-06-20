@@ -1,13 +1,14 @@
-import * as mongoose from 'mongoose';
 import * as nconf from 'nconf';
 import * as path from 'path';
 
 export const EnvVars = {
-  MONGO_URL: 'MONGO_URL',
+  MONGODB_URI: 'MONGODB_URI',
   NODE_ENV: 'NODE_ENV',
+  HOST: 'HOST',
   PORT: 'PORT',
   SECRET: 'SECRET',
   LOG_FILE_NAME: 'LOG_FILE_NAME',
+  ORIGIN_ALLOWED: 'ORIGIN_ALLOWED',
 };
 
 const config = nconf
@@ -15,11 +16,13 @@ const config = nconf
   .argv()
   // 2. Envrionment vars
   .env([
-    EnvVars.MONGO_URL,
+    EnvVars.MONGODB_URI,
     EnvVars.NODE_ENV,
     EnvVars.PORT,
     EnvVars.SECRET,
     EnvVars.LOG_FILE_NAME,
+    EnvVars.HOST,
+    EnvVars.ORIGIN_ALLOWED,
   ])
   // 3. Config file
   .file({
@@ -27,13 +30,15 @@ const config = nconf
   })
   // provide defaults for dev env or defaults
   .defaults({
-    [EnvVars.PORT]: 3000,
+    [EnvVars.HOST]: '0.0.0.0',
+    [EnvVars.PORT]: 3200,
     [EnvVars.NODE_ENV]: 'development',
-    [EnvVars.MONGO_URL]: 'mongodb://localhost:27017/nodejs_service',
-    [EnvVars.LOG_FILE_NAME]: 'logs/nodejs-service-log.log',
+    [EnvVars.MONGODB_URI]: 'mongodb://localhost:27017/events',
+    [EnvVars.LOG_FILE_NAME]: 'logs/nodejs-webservice-boilerplate.log',
+    [EnvVars.ORIGIN_ALLOWED]: 'http://localhost:8080',
   });
 
-checkConfig(EnvVars.MONGO_URL);
+checkConfig(EnvVars.MONGODB_URI);
 checkConfig(EnvVars.NODE_ENV);
 checkConfig(EnvVars.PORT);
 
@@ -46,6 +51,4 @@ function checkConfig(setting: string): void {
   }
 }
 
-const mongoConnect = () => mongoose.connect(config.get(EnvVars.MONGO_URL), { useNewUrlParser: true });
-
-export { config, mongoConnect };
+export { config };
