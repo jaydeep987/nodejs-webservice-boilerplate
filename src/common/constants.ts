@@ -3,9 +3,11 @@
  */
 export enum ResponseStatus {
   OK = 200,
+  OK_CREATED = 201,
   NOT_FOUND = 404,
   INTERNAL_ERROR = 500,
   BAD_REQUEST = 400,
+  AUTH_FAILED = 401,
 }
 
 /**

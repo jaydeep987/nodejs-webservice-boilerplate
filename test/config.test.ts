@@ -25,10 +25,10 @@ describe('Test app config', () => {
       proxyquire('../src/common/config', { nconf: nconfMock }).default;
     };
 
-    expect(testFunc).to.throw(Error, getMsg(EnvVars.MONGO_URL));
+    expect(testFunc).to.throw(Error, getMsg(EnvVars.MONGODB_URI));
 
-    nconfMock[EnvVars.MONGO_URL] = 'someurl';
-    expect(testFunc).to.not.throw(Error, getMsg(EnvVars.MONGO_URL));
+    nconfMock[EnvVars.MONGODB_URI] = 'someurl';
+    expect(testFunc).to.not.throw(Error, getMsg(EnvVars.MONGODB_URI));
     expect(testFunc).to.throw(Error, getMsg(EnvVars.NODE_ENV));
 
     nconfMock[EnvVars.NODE_ENV] = 'test';
